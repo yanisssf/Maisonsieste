@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+/* ---------- Maison Sieste tokens ----------
+   Day = pale morning sky, Night = mode nuit (toggle in nav). */
+:root {
+  --sky: #e9eeff;
+  --sky-2: #f6e9ff;
+  --cloud: #ffffff;
+  --ink: #18204a;
+  --dusk: #4f5fc0;
+  --peach: #ff9466;
+  --peach-ink: #2a1408;
+  --mute: #545b7c;
+  --line: #cdd6f6;
+  --foam: #f4f6ff;
+  --star: #ffd9a8;
+  --lilac: #c9b8ff;
+  --on-dusk: #ffffff;
+  /* the product itself stays white, day or night */
+  --pw-1: #ffffff;
+  --pw-2: #f4f6ff;
+  --pw-3: #cdd6f6;
+  color-scheme: light;
+}
+:root[data-theme='night'] {
+  --sky: #0f1430;
+  --sky-2: #1c1544;
+  --cloud: #1a2150;
+  --ink: #eef1ff;
+  --dusk: #a3b0ff;
+  --peach: #ff9e73;
+  --peach-ink: #2a1408;
+  --mute: #b0b7dc;
+  --line: #2f3874;
+  --foam: #232b5e;
+  --star: #ffd9a8;
+  --lilac: #7c6be0;
+  --on-dusk: #18204a;
+  --pw-1: #ffffff;
+  --pw-2: #e6eaff;
+  --pw-3: #b9c3ee;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-sky: var(--sky);
+  --color-sky-2: var(--sky-2);
+  --color-cloud: var(--cloud);
+  --color-ink: var(--ink);
+  --color-dusk: var(--dusk);
+  --color-peach: var(--peach);
+  --color-peach-ink: var(--peach-ink);
+  --color-mute: var(--mute);
+  --color-line: var(--line);
+  --color-foam: var(--foam);
+  --color-star: var(--star);
+  --color-lilac: var(--lilac);
+  --color-on-dusk: var(--on-dusk);
+  --font-display: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --animate-marquee: marquee var(--duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+body {
+  margin: 0;
+  background: var(--sky);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background-color 0.6s ease, color 0.6s ease;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+::selection {
+  background: var(--peach);
+  color: var(--peach-ink);
+}
+:focus-visible {
+  outline: 3px solid var(--dusk);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* chunky "clay" button */
+.btn-sun {
+  background: var(--peach);
+  color: var(--peach-ink);
+  box-shadow: 0 7px 0 -1px color-mix(in srgb, var(--peach) 50%, #18204a), inset 0 -3px 0 rgb(0 0 0 / 0.06);
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s;
+}
+.btn-sun:hover {
+  transform: translateY(-3px);
+}
+.btn-sun:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 -1px color-mix(in srgb, var(--peach) 50%, #18204a);
+}
+
+.clay {
+  background: var(--cloud);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 24px 48px -28px rgb(24 32 74 / 0.35);
+}
+
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
