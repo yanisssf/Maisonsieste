@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
-import { PACKS } from '../data'
+import { PACKS, colorOf, type ColorId } from '../data'
 import { useCart } from '../cart'
 import { euro } from '../lib/utils'
-import { PillowArt } from './Cloud'
 
 export function CartDrawer() {
   const { lines, total, open, setOpen, setQty, add } = useCart()
@@ -70,9 +69,10 @@ export function CartDrawer() {
                   <AnimatePresence initial={false}>
                     {lines.map((l) => {
                       const p = PACKS[l.id]
+                      const c = colorOf(l.color)
                       return (
                         <motion.li
-                          key={l.id}
+                          key={l.key}
                           layout
                           initial={{ opacity: 0, x: 30 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -80,21 +80,24 @@ export function CartDrawer() {
                           className="clay grid grid-cols-[80px_1fr] items-center gap-4 rounded-3xl p-4"
                         >
                           <div className="grid aspect-square place-items-center rounded-2xl bg-foam p-1">
-                            <PillowArt className="w-full" />
+                            <img src={c.src} alt="" className="w-full" />
                           </div>
                           <div className="grid gap-2">
                             <div className="flex justify-between gap-2 font-display text-lg font-semibold">
-                              <span>{p.name}</span>
+                              <span>
+                                {p.name}
+                                <span className="block font-sans text-sm font-bold text-mute">{c.name}</span>
+                              </span>
                               <span className="tabular-nums">{euro(p.price * l.qty)}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <button type="button" aria-label={`Retirer un ${p.name}`} onClick={() => setQty(l.id, l.qty - 1)} className="grid size-11 cursor-pointer place-items-center rounded-full bg-foam ring-1 ring-line">
+                              <button type="button" aria-label={`Retirer un ${p.name}`} onClick={() => setQty(l.key, l.qty - 1)} className="grid size-11 cursor-pointer place-items-center rounded-full bg-foam ring-1 ring-line">
                                 <Minus className="size-4" />
                               </button>
                               <span className="w-6 text-center font-bold tabular-nums" aria-live="polite">
                                 {l.qty}
                               </span>
-                              <button type="button" aria-label={`Ajouter un ${p.name}`} onClick={() => setQty(l.id, l.qty + 1)} className="grid size-11 cursor-pointer place-items-center rounded-full bg-foam ring-1 ring-line">
+                              <button type="button" aria-label={`Ajouter un ${p.name}`} onClick={() => setQty(l.key, l.qty + 1)} className="grid size-11 cursor-pointer place-items-center rounded-full bg-foam ring-1 ring-line">
                                 <Plus className="size-4" />
                               </button>
                             </div>
@@ -113,8 +116,8 @@ export function CartDrawer() {
                     type="button"
                     onClick={() => {
                       const solo = lines.find((l) => l.id === 'solo')!
-                      setQty('solo', solo.qty - 1)
-                      add('duo')
+                      setQty(solo.key, solo.qty - 1)
+                      add('duo', solo.color)
                     }}
                     className="mt-3 min-h-11 cursor-pointer rounded-full bg-on-dusk px-5 font-bold text-dusk"
                   >
@@ -147,7 +150,7 @@ export function CartDrawer() {
   )
 }
 
-export function StickyBuy() {
+export function StickyBuy({ color }: { color: ColorId }) {
   const { add } = useCart()
   const [show, setShow] = useState(false)
   useEffect(() => {
@@ -175,7 +178,7 @@ export function StickyBuy() {
             Cloud Pillow
             <span className="block text-sm text-mute">dès 49 € · 2 pour 79 €</span>
           </span>
-          <button type="button" onClick={() => add('duo')} className="btn-sun min-h-12 cursor-pointer rounded-full px-5 font-display font-semibold">
+          <button type="button" onClick={() => add('duo', color)} className="btn-sun min-h-12 cursor-pointer rounded-full px-5 font-display font-semibold">
             Le duo · 79 €
           </button>
         </motion.div>

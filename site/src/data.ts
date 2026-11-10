@@ -3,6 +3,22 @@
 
 export type PackId = 'solo' | 'duo'
 
+const IMG = `${import.meta.env.BASE_URL}img/`
+export const img = (name: string) => `${IMG}${name}.webp`
+
+// Coloris proposés par le fournisseur (à confirmer avec la commande d'échantillons).
+export type ColorId = 'marine' | 'ciel' | 'rose' | 'sable' | 'gris'
+export const COLORS: { id: ColorId; name: string; hex: string; src: string }[] = [
+  { id: 'marine', name: 'Bleu nuit', hex: '#2F3F72', src: img('pillow-marine') },
+  { id: 'ciel', name: 'Bleu ciel', hex: '#B4CBF0', src: img('pillow-ciel') },
+  { id: 'rose', name: 'Rose poudré', hex: '#F2C9D0', src: img('pillow-rose') },
+  { id: 'sable', name: 'Sable', hex: '#F4E1A1', src: img('pillow-sable') },
+  { id: 'gris', name: 'Gris perle', hex: '#B9BDC4', src: img('pillow-gris') },
+]
+export const colorOf = (id: ColorId) => COLORS.find((c) => c.id === id)!
+export const PHOTO_LIT = img('sieste-lit')
+export const SIZE = '69 × 38 cm'
+
 export const PACKS: Record<PackId, { id: PackId; name: string; sub: string; price: number; was?: number; pillows: number }> = {
   solo: { id: 'solo', name: '1 Cloud Pillow', sub: 'Pour toi', price: 49, pillows: 1 },
   duo: { id: 'duo', name: 'Le duo', sub: '2 Cloud Pillow · 39,50 € l’oreiller', price: 79, was: 98, pillows: 2 },
@@ -12,7 +28,8 @@ export const TRUST = ['Essai 30 nuits', 'Livré en France', 'Paiement sécurisé
 
 export const TICKER = [
   'Mousse à mémoire de forme',
-  'Double hauteur',
+  'Double face, double hauteur',
+  '5 coloris',
   'Housse amovible et lavable',
   'Livré roulé sous vide',
   'Essai 30 nuits',

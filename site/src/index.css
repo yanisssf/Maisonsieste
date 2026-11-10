@@ -17,9 +17,9 @@
   --lilac: #c9b8ff;
   --on-dusk: #ffffff;
   /* the product itself stays white, day or night */
-  --pw-1: #ffffff;
-  --pw-2: #f4f6ff;
-  --pw-3: #cdd6f6;
+  --pw-1: #5266a3;
+  --pw-2: #34457c;
+  --pw-3: #1f2a52;
   color-scheme: light;
 }
 :root[data-theme='night'] {
@@ -36,9 +36,9 @@
   --star: #ffd9a8;
   --lilac: #7c6be0;
   --on-dusk: #18204a;
-  --pw-1: #ffffff;
-  --pw-2: #e6eaff;
-  --pw-3: #b9c3ee;
+  --pw-1: #6a7fc0;
+  --pw-2: #3e5090;
+  --pw-3: #8e9fd8;
   color-scheme: dark;
 }
 
@@ -79,7 +79,7 @@ body {
   font-family: var(--font-sans);
   font-size: 17px;
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
   transition: background-color 0.6s ease, color 0.6s ease;
 }
 h1,

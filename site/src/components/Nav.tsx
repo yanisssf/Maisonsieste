@@ -6,8 +6,8 @@ import { useCart } from '../cart'
 import { cn } from '../lib/utils'
 
 const LINKS = [
-  { href: '#appuie', label: 'Le Cloud Pillow' },
-  { href: '#hauteur', label: 'Double hauteur' },
+  { href: '#histoire', label: 'Le Cloud Pillow' },
+  { href: '#offre', label: 'Coloris & prix' },
   { href: '#quiz', label: 'Quiz' },
   { href: '#faq', label: 'FAQ' },
 ]

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, RotateCcw } from 'lucide-react'
 import { SectionHead, Reveal } from './ui'
 import { useCart } from '../cart'
+import type { ColorId } from '../data'
 
 const Q = [
   { id: 'pos', title: 'Comment tu t’endors le plus souvent ?', opts: [['dos', 'Sur le dos'], ['cote', 'Sur le côté'], ['ventre', 'Sur le ventre']] },
@@ -10,7 +11,7 @@ const Q = [
   { id: 'matin', title: 'Le matin, tu te réveilles plutôt…', opts: [['raide', 'La nuque un peu raide'], ['bras', 'Le bras engourdi'], ['forme', 'En forme, je veux juste mieux']] },
 ] as const
 
-export function Quiz() {
+export function Quiz({ color }: { color: ColorId }) {
   const [step, setStep] = useState(0)
   const [ans, setAns] = useState<Record<string, string>>({})
   const { add } = useCart()
@@ -74,7 +75,7 @@ export function Quiz() {
                 <p className="mt-4 text-lg">{text}</p>
                 <p className="mt-3 text-mute">Laisse-toi quelques nuits pour t’habituer, c’est normal avec une mousse à mémoire de forme. Et tu as 30 nuits pour l’essayer.</p>
                 <div className="mt-7 flex flex-wrap items-center gap-4">
-                  <button type="button" onClick={() => add('solo')} className="btn-sun min-h-14 cursor-pointer rounded-full px-7 font-display text-lg font-semibold">
+                  <button type="button" onClick={() => add('solo', color)} className="btn-sun min-h-14 cursor-pointer rounded-full px-7 font-display text-lg font-semibold">
                     Je veux mon Cloud Pillow · 49 €
                   </button>
                   <button

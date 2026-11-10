@@ -1,15 +1,15 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { PACKS, type PackId } from './data'
+import { PACKS, type ColorId, type PackId } from './data'
 
-type Line = { id: PackId; qty: number }
+export type Line = { key: string; id: PackId; color: ColorId; qty: number }
 type Cart = {
   lines: Line[]
   count: number
   total: number
   open: boolean
   setOpen: (o: boolean) => void
-  add: (id: PackId) => void
-  setQty: (id: PackId, qty: number) => void
+  add: (id: PackId, color?: ColorId) => void
+  setQty: (key: string, qty: number) => void
 }
 
 const Ctx = createContext<Cart | null>(null)
@@ -18,16 +18,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<Line[]>([])
   const [open, setOpen] = useState(false)
 
-  const add = useCallback((id: PackId) => {
+  const add = useCallback((id: PackId, color: ColorId = 'marine') => {
+    const key = `${id}-${color}`
     setLines((ls) => {
-      const found = ls.find((l) => l.id === id)
-      return found ? ls.map((l) => (l.id === id ? { ...l, qty: l.qty + 1 } : l)) : [...ls, { id, qty: 1 }]
+      const found = ls.find((l) => l.key === key)
+      return found ? ls.map((l) => (l.key === key ? { ...l, qty: l.qty + 1 } : l)) : [...ls, { key, id, color, qty: 1 }]
     })
     setOpen(true)
   }, [])
 
-  const setQty = useCallback((id: PackId, qty: number) => {
-    setLines((ls) => (qty <= 0 ? ls.filter((l) => l.id !== id) : ls.map((l) => (l.id === id ? { ...l, qty } : l))))
+  const setQty = useCallback((key: string, qty: number) => {
+    setLines((ls) => (qty <= 0 ? ls.filter((l) => l.key !== key) : ls.map((l) => (l.key === key ? { ...l, qty } : l))))
   }, [])
 
   const value = useMemo<Cart>(() => {

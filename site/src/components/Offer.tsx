@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, X } from 'lucide-react'
-import { PACKS, type PackId } from '../data'
+import { COLORS, PACKS, colorOf, type ColorId, type PackId } from '../data'
 import { useCart } from '../cart'
 import { euro, cn } from '../lib/utils'
 import { Eyebrow, Reveal, SectionHead } from './ui'
@@ -48,7 +48,7 @@ export function Compare() {
   )
 }
 
-export function Offer() {
+export function Offer({ color, setColor }: { color: ColorId; setColor: (c: ColorId) => void }) {
   const [pack, setPack] = useState<PackId>('duo')
   const { add } = useCart()
   const p = PACKS[pack]
@@ -72,13 +72,45 @@ export function Offer() {
             <p className="font-display text-sm font-semibold tracking-[0.14em] text-[#FFD9A8] uppercase">Commander</p>
             <h2 className="mt-3 text-[clamp(2.4rem,5vw,4rem)] font-bold">Un nuage, ou deux ?</h2>
             <p className="mt-4 max-w-[36ch] text-lg opacity-80">On dort rarement seul. Le duo te fait économiser 19 €, et tu as 30 nuits pour l’essayer.</p>
+            <div className="relative mt-8 grid aspect-[1.6] max-w-[520px] place-items-center">
+              <div className="absolute inset-[10%] rounded-full blur-3xl" style={{ background: colorOf(color).hex, opacity: 0.35 }} />
+              <AnimatePresence mode="popLayout" initial={false}>
+                {Array.from({ length: PACKS[pack].pillows }).map((_, i) => (
+                  <motion.img
+                    key={`${color}-${pack}-${i}`}
+                    src={colorOf(color).src}
+                    alt={i === 0 ? `Cloud Pillow ${colorOf(color).name}` : ''}
+                    className="absolute w-[78%] drop-shadow-[0_30px_30px_rgb(0_0_0/0.45)]"
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: pack === 'duo' ? 0.82 : 1, x: pack === 'duo' ? (i === 0 ? '-14%' : '14%') : 0, y: pack === 'duo' ? (i === 0 ? -18 : 18) : 0 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
           </div>
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              add(pack)
+              add(pack, color)
             }}
           >
+            <fieldset className="mb-6 grid gap-3">
+              <legend className="mb-3 font-display text-sm font-semibold tracking-[0.14em] text-[#FFD9A8] uppercase">Couleur · {colorOf(color).name}</legend>
+              <div className="flex flex-wrap gap-3">
+                {COLORS.map((c) => (
+                  <label key={c.id} className="cursor-pointer" title={c.name}>
+                    <input type="radio" name="color" value={c.id} checked={color === c.id} onChange={() => setColor(c.id)} className="peer sr-only" />
+                    <span className="sr-only">{c.name}</span>
+                    <span
+                      className={cn('block size-11 rounded-full ring-2 ring-offset-4 ring-offset-[#18204A] transition peer-focus-visible:outline-3 peer-focus-visible:outline-[#FF9466]', color === c.id ? 'ring-[#FF9466]' : 'ring-transparent hover:ring-white/40')}
+                      style={{ background: c.hex }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <fieldset className="grid gap-4">
               <legend className="mb-3 font-display text-sm font-semibold tracking-[0.14em] text-[#FFD9A8] uppercase">Choisis ton offre</legend>
               {(Object.keys(PACKS) as PackId[]).map((id) => {

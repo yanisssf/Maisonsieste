@@ -1,29 +1,25 @@
-import { useRef, useState, type PointerEvent } from 'react'
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
-import { ArrowRight, Lock, MoonStar, Truck } from 'lucide-react'
-import { PillowArt, SkyCloud } from './Cloud'
+// Layout inspired by 21st.dev "Hero Section" (ravikatiyar162): two columns, animated headline,
+// actions, key figures, and an image collage. Images are the real Cloud Pillow photos.
+import { useRef, type PointerEvent, type ReactNode } from 'react'
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react'
+import { ArrowRight, MoonStar } from 'lucide-react'
+import { COLORS, PHOTO_LIT, SIZE, type ColorId, colorOf } from '../data'
+import { SkyCloud } from './Cloud'
+import { cn } from '../lib/utils'
 
-const CLOUDS = [
-  { x: '4%', y: '14%', w: 'w-40', depth: 30, o: 0.9, dur: 60 },
-  { x: '70%', y: '6%', w: 'w-56', depth: 50, o: 0.75, dur: 80 },
-  { x: '82%', y: '62%', w: 'w-32', depth: 20, o: 0.85, dur: 55 },
-  { x: '-6%', y: '70%', w: 'w-64', depth: 60, o: 0.6, dur: 90 },
-  { x: '40%', y: '88%', w: 'w-48', depth: 40, o: 0.7, dur: 70 },
+const STATS = [
+  ['30', 'nuits d’essai'],
+  ['2', 'hauteurs en 1'],
+  ['5', 'coloris'],
 ]
 
-type Puff = { id: number; x: number; y: number }
-
-export function Hero({ night }: { night: boolean }) {
+export function Hero({ color, setColor }: { color: ColorId; setColor: (c: ColorId) => void }) {
   const ref = useRef<HTMLElement>(null)
   const reduce = useReducedMotion()
   const mx = useMotionValue(0)
   const my = useMotionValue(0)
-  const sx = useSpring(mx, { stiffness: 60, damping: 20 })
-  const sy = useSpring(my, { stiffness: 60, damping: 20 })
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const pillowY = useTransform(scrollYProgress, [0, 1], [0, 120])
-  const pillowRot = useTransform(sx, [-1, 1], [-4, 4])
-  const [puffs, setPuffs] = useState<Puff[]>([])
+  const sx = useSpring(mx, { stiffness: 70, damping: 20 })
+  const sy = useSpring(my, { stiffness: 70, damping: 20 })
 
   const onMove = (e: PointerEvent) => {
     if (reduce || e.pointerType !== 'mouse') return
@@ -31,210 +27,172 @@ export function Hero({ night }: { night: boolean }) {
     mx.set(((e.clientX - r.left) / r.width) * 2 - 1)
     my.set(((e.clientY - r.top) / r.height) * 2 - 1)
   }
-  const onClick = (e: PointerEvent) => {
-    if ((e.target as HTMLElement).closest('a,button')) return
-    const r = ref.current!.getBoundingClientRect()
-    const id = Date.now() + Math.random()
-    setPuffs((p) => [...p.slice(-8), { id, x: e.clientX - r.left, y: e.clientY - r.top }])
-    setTimeout(() => setPuffs((p) => p.filter((q) => q.id !== id)), 1600)
-  }
 
-  const words = ['Dors', 'sur']
+  const line1 = 'Dors sur'.split(' ')
 
   return (
-    <section
-      id="top"
-      ref={ref}
-      onPointerMove={onMove}
-      onPointerDown={onClick}
-      className="grain relative isolate overflow-hidden bg-gradient-to-b from-sky via-sky to-sky-2 pt-8 pb-20 sm:pt-12"
-    >
-      {/* sky: stars at night, sun by day */}
-      <AnimatePresence>
-        {night ? (
-          <motion.div key="stars" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-            {Array.from({ length: 40 }).map((_, i) => (
-              <span
-                key={i}
-                className="absolute size-1 rounded-full bg-star"
-                style={{
-                  left: `${(i * 37) % 100}%`,
-                  top: `${(i * 53) % 70}%`,
-                  animation: `twinkle ${2 + (i % 5)}s ease-in-out ${i * 0.17}s infinite`,
-                  opacity: 0.4,
-                }}
-              />
-            ))}
-            <div className="absolute top-16 right-[12%] size-24 rounded-full bg-star shadow-[0_0_80px_20px_rgb(255_217_168/0.35)]" />
-            <div className="absolute top-12 right-[10%] size-24 rounded-full bg-sky" />
-          </motion.div>
-        ) : (
+    <section ref={ref} id="top" onPointerMove={onMove} className="grain relative isolate overflow-hidden bg-gradient-to-b from-sky via-sky to-sky-2 pt-6 pb-20 sm:pt-10 lg:pb-28">
+      <SkyCloud className="pointer-events-none absolute top-24 -left-16 -z-10 w-72 opacity-70" />
+      <SkyCloud className="pointer-events-none absolute -right-20 bottom-10 -z-10 w-96 opacity-60" />
+
+      <div className="mx-auto grid max-w-[1240px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+        {/* copy */}
+        <div className="relative z-10">
           <motion.div
-            key="sun"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            className="pointer-events-none absolute top-14 right-[12%] -z-10 size-28 rounded-full bg-peach/90 shadow-[0_0_120px_40px_rgb(255_148_102/0.35)]"
-            aria-hidden="true"
-          />
-        )}
-      </AnimatePresence>
-
-      {CLOUDS.map((c, i) => (
-        <Drift key={i} c={c} sx={sx} sy={sy} reduce={!!reduce} />
-      ))}
-
-      {puffs.map((p) => (
-        <motion.div
-          key={p.id}
-          className="pointer-events-none absolute z-20"
-          style={{ left: p.x - 30, top: p.y - 18 }}
-          initial={{ scale: 0.2, opacity: 1, y: 0 }}
-          animate={{ scale: 1.2, opacity: 0, y: -70 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-          aria-hidden="true"
-        >
-          <SkyCloud className="w-16 drop-shadow-md" />
-        </motion.div>
-      ))}
-
-      <div className="relative mx-auto grid max-w-[1200px] items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_1fr]">
-        <div>
-          <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-5 inline-flex items-center gap-2 rounded-full bg-cloud/70 px-4 py-1.5 font-display text-sm font-semibold tracking-wide text-dusk ring-1 ring-line backdrop-blur"
+            className="mb-6 inline-flex items-center gap-2 rounded-full bg-cloud px-4 py-2 text-sm font-bold shadow-sm ring-1 ring-line"
           >
-            <span className="size-2 animate-pulse rounded-full bg-peach" />
+            <span className="size-2 animate-pulse rounded-full bg-peach" aria-hidden="true" />
             Nouveau · le Cloud Pillow
-          </motion.p>
-          <h1 className="text-[clamp(3.2rem,9vw,7rem)] font-bold">
-            {words.map((w, i) => (
+          </motion.div>
+
+          <h1 className="text-[clamp(3.2rem,8.4vw,6.8rem)] leading-[0.95] font-bold">
+            {line1.map((w, i) => (
               <motion.span
                 key={w}
-                className="mr-[0.25em] inline-block"
-                initial={{ opacity: 0, y: 40, rotate: -4 }}
+                className="mr-[0.22em] inline-block"
+                initial={{ opacity: 0, y: 50, rotate: -6 }}
                 animate={{ opacity: 1, y: 0, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.1 + i * 0.12 }}
               >
                 {w}
               </motion.span>
             ))}
+            <br />
             <motion.span
-              className="block bg-gradient-to-r from-dusk via-lilac to-peach bg-clip-text text-transparent"
-              initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }}
+              className="inline-block bg-gradient-to-r from-dusk via-lilac to-peach bg-clip-text pb-2 text-transparent"
+              initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 1.1, delay: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+              transition={{ duration: 1.1, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
             >
               un nuage.
             </motion.span>
           </h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-6 max-w-[34ch] text-xl text-mute"
-          >
-            L’oreiller à mémoire de forme qui épouse ta nuque, avec deux hauteurs : une pour le dos, une pour le côté.
+
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-6 max-w-[36ch] text-xl text-mute">
+            L’oreiller en mousse à mémoire de forme, double face : un côté bas pour le dos, un côté haut pour le côté.
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="mt-8 flex flex-wrap items-center gap-4"
-          >
+
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }} className="mt-8 flex flex-wrap items-center gap-3">
             <a href="#offre" className="btn-sun group inline-flex min-h-14 items-center gap-2 rounded-full px-7 font-display text-lg font-semibold">
               Je veux mon nuage
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
             </a>
-            <span className="font-display font-semibold text-mute">
-              dès <b className="text-2xl text-ink">49 €</b> · <span className="text-ink">2 pour 79 €</span>
-            </span>
+            <a href="#histoire" className="inline-flex min-h-14 items-center gap-2 rounded-full px-6 font-display text-lg font-semibold ring-2 ring-line transition hover:ring-dusk">
+              Découvrir
+            </a>
           </motion.div>
-          <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-[15px] font-bold">
-            {[
-              [MoonStar, 'Essai 30 nuits'],
-              [Truck, 'Livré en France'],
-              [Lock, 'Paiement sécurisé'],
-            ].map(([Icon, t], i) => {
-              const I = Icon as typeof MoonStar
-              return (
-                <motion.li
-                  key={t as string}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.15 + i * 0.08 }}
-                  className="flex items-center gap-2"
-                >
-                  <I className="size-5 text-dusk" aria-hidden="true" />
-                  {t as string}
-                </motion.li>
-              )
-            })}
-          </ul>
-          <p className="mt-6 hidden text-sm text-mute sm:block">Astuce : clique dans le ciel.</p>
+
+          <motion.dl initial="h" animate="s" transition={{ staggerChildren: 0.1, delayChildren: 1 }} className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+            {STATS.map(([n, l]) => (
+              <motion.div key={l} variants={{ h: { opacity: 0, y: 12 }, s: { opacity: 1, y: 0 } }} className="grid">
+                <dt className="sr-only">{l}</dt>
+                <dd className="font-display text-4xl font-bold text-dusk tabular-nums">{n}</dd>
+                <dd className="text-[15px] font-bold text-mute">{l}</dd>
+              </motion.div>
+            ))}
+          </motion.dl>
         </div>
 
-        <motion.div style={{ y: reduce ? 0 : pillowY }} className="relative mx-auto w-full max-w-[560px]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 70, damping: 14, delay: 0.3 }}
+        {/* collage */}
+        <div className="relative grid grid-cols-[1.25fr_1fr] grid-rows-[auto_auto] gap-4 sm:gap-5">
+          <Tile sx={sx} sy={sy} depth={10} delay={0.2} className="row-span-2 overflow-hidden rounded-[32px] shadow-[0_40px_80px_-40px_rgb(24_32_74/0.55)]">
+            <img src={PHOTO_LIT} alt="Une femme dort sur le dos, la nuque posée sur le Cloud Pillow bleu nuit" className="h-full min-h-[340px] w-full object-cover object-[58%_center] sm:min-h-[460px]" width={1416} height={1278} />
+            <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-2xl bg-cloud/85 px-4 py-3 text-sm font-bold backdrop-blur-md">
+              <MoonStar className="size-4 shrink-0 text-dusk" aria-hidden="true" />
+              Nuque soutenue, sur le dos comme sur le côté
+            </div>
+          </Tile>
+
+          <Tile sx={sx} sy={sy} depth={22} delay={0.35} className="clay grid content-between gap-3 rounded-[28px] p-4">
+            <ColorStage color={color} />
+            <div role="radiogroup" aria-label="Couleur du Cloud Pillow" className="flex flex-wrap gap-2">
+              {COLORS.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={color === c.id}
+                  aria-label={c.name}
+                  title={c.name}
+                  onClick={() => setColor(c.id)}
+                  className={cn('size-8 cursor-pointer rounded-full ring-2 ring-offset-2 ring-offset-cloud transition', color === c.id ? 'ring-dusk' : 'ring-transparent hover:ring-line')}
+                  style={{ background: c.hex }}
+                />
+              ))}
+            </div>
+          </Tile>
+
+          <Tile sx={sx} sy={sy} depth={34} delay={0.5} className="grid content-center gap-1 rounded-[28px] bg-dusk p-5 text-on-dusk">
+            <span className="font-display text-sm font-semibold tracking-[0.14em] uppercase opacity-80">Le duo</span>
+            <span className="font-display text-4xl font-bold">79 €</span>
+            <span className="text-[15px] font-semibold opacity-85">au lieu de 98 € · {SIZE}</span>
+          </Tile>
+
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-6 right-6 font-display text-4xl font-bold text-dusk"
+            animate={reduce ? undefined : { opacity: [0, 1, 0], y: [0, -40], x: [0, 16] }}
+            transition={{ duration: 3.4, repeat: Infinity }}
           >
-            <motion.div
-              style={{ rotate: reduce ? 0 : pillowRot }}
-              animate={reduce ? undefined : { y: [0, -16, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <PillowArt className="w-full drop-shadow-[0_40px_40px_rgb(79_95_192/0.25)]" />
-            </motion.div>
-            <div className="mx-auto -mt-4 h-5 w-2/3 rounded-[50%] bg-ink/10 blur-md" aria-hidden="true" />
-          </motion.div>
-          {['z', 'z', 'z'].map((z, i) => (
-            <motion.span
-              key={i}
-              aria-hidden="true"
-              className="absolute font-display font-bold text-dusk"
-              style={{ right: `${18 - i * 4}%`, top: `${14 - i * 4}%`, fontSize: 34 - i * 7 }}
-              animate={reduce ? undefined : { opacity: [0, 1, 0], x: [0, 20], y: [0, -50] }}
-              transition={{ duration: 3.6, repeat: Infinity, delay: i * 1.2 }}
-            >
-              {z}
-            </motion.span>
-          ))}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
-            animate={{ opacity: 1, scale: 1, rotate: -6 }}
-            transition={{ type: 'spring', delay: 1.3 }}
-            className="absolute bottom-6 left-2 rounded-2xl bg-cloud px-4 py-3 font-display font-semibold shadow-xl ring-1 ring-line sm:left-0"
-          >
-            <span className="block text-xs tracking-widest text-dusk uppercase">Le duo</span>
-            <span className="text-lg">−19 € à deux</span>
-          </motion.div>
-        </motion.div>
+            z
+          </motion.span>
+        </div>
       </div>
-      <style>{`@keyframes twinkle{50%{opacity:1;transform:scale(1.6)}}`}</style>
     </section>
   )
 }
 
-function Drift({
-  c,
+export function ColorStage({ color, className }: { color: ColorId; className?: string }) {
+  const c = colorOf(color)
+  return (
+    <div className={cn('relative grid aspect-[1.55] place-items-center overflow-hidden rounded-[20px]', className)} style={{ background: `radial-gradient(circle at 50% 60%, ${c.hex}55, transparent 70%)` }}>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.img
+          key={c.id}
+          src={c.src}
+          alt={`Cloud Pillow coloris ${c.name}`}
+          className="w-[92%] drop-shadow-[0_18px_18px_rgb(24_32_74/0.28)]"
+          initial={{ opacity: 0, scale: 0.85, rotate: -6, y: 10 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, rotate: 6, y: -10 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+          width={1068}
+          height={656}
+        />
+      </AnimatePresence>
+      <span className="absolute top-2 left-3 text-sm font-bold text-ink/80">{c.name}</span>
+    </div>
+  )
+}
+
+function Tile({
+  children,
+  className,
   sx,
   sy,
-  reduce,
+  depth,
+  delay,
 }: {
-  c: (typeof CLOUDS)[number]
-  sx: ReturnType<typeof useSpring>
-  sy: ReturnType<typeof useSpring>
-  reduce: boolean
+  children: ReactNode
+  className?: string
+  sx: MotionValue<number>
+  sy: MotionValue<number>
+  depth: number
+  delay: number
 }) {
-  const x = useTransform(sx, (v) => v * -c.depth)
-  const y = useTransform(sy, (v) => v * -c.depth * 0.5)
+  const x = useTransform(sx, (v) => v * -depth)
+  const y = useTransform(sy, (v) => v * -depth)
   return (
-    <motion.div className={`pointer-events-none absolute -z-10 ${c.w}`} style={{ left: c.x, top: c.y, x, y }} aria-hidden="true">
-      <motion.div animate={reduce ? undefined : { x: [0, 40, 0] }} transition={{ duration: c.dur / 3, repeat: Infinity, ease: 'easeInOut' }}>
-        <SkyCloud opacity={c.o} className="w-full" />
+    <motion.div
+      initial={{ opacity: 0, y: 40, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 80, damping: 16, delay }}
+      className={cn('relative', className?.includes('row-span-2') && 'row-span-2')}
+    >
+      <motion.div style={{ x, y }} className={cn('relative h-full', className?.replace('row-span-2', ''))}>
+        {children}
       </motion.div>
     </motion.div>
   )

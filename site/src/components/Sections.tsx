@@ -3,7 +3,8 @@ import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
 import { Plus } from 'lucide-react'
 import { FAQ } from '../data'
 import { cn } from '../lib/utils'
-import { CloudMark, PillowArt, SkyCloud } from './Cloud'
+import { CloudMark, SkyCloud } from './Cloud'
+import { colorOf, type ColorId } from '../data'
 import { Reveal, SectionHead } from './ui'
 
 export function Steps() {
@@ -86,7 +87,7 @@ export function Faq() {
   )
 }
 
-export function Final() {
+export function Final({ color }: { color: ColorId }) {
   const { scrollYProgress } = useScroll()
   const y = useTransform(scrollYProgress, [0.8, 1], [80, 0])
   return (
@@ -105,7 +106,7 @@ export function Final() {
           Je veux mon nuage
         </a>
         <motion.div style={{ y }} className="w-full max-w-[520px]">
-          <PillowArt className="w-full drop-shadow-[0_30px_30px_rgb(79_95_192/0.25)]" />
+          <img src={colorOf(color).src} alt={`Cloud Pillow ${colorOf(color).name}`} className="w-full drop-shadow-[0_30px_30px_rgb(24_32_74/0.3)]" />
         </motion.div>
       </div>
     </section>
