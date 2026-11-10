@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+/* Maison Sieste · Premium
+   Layout: full-bleed photo opener, then calm white/steel bands with hairline rules and sharp corners.
+   One accent only: the product's own navy. Metal = brushed steel gradients on product stages. */
+:root {
+  --paper: #f5f6f7;
+  --white: #ffffff;
+  --ink: #111318;
+  --graphite: #1b1e24;
+  --mute: #5b616c;
+  --rule: #d9dce1;
+  --steel: #c8cdd4;
+  --navy: #2f3f72;
+  --metal: linear-gradient(135deg, #f8f9fa 0%, #dfe2e6 28%, #bfc5cd 48%, #eef0f2 62%, #c9ced5 82%, #e6e8eb 100%);
+  --metal-dark: linear-gradient(135deg, #2a2e36 0%, #15171c 40%, #3a3f48 58%, #16181d 100%);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-white: var(--white);
+  --color-ink: var(--ink);
+  --color-graphite: var(--graphite);
+  --color-mute: var(--mute);
+  --color-rule: var(--rule);
+  --color-steel: var(--steel);
+  --color-navy: var(--navy);
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+::selection {
+  background: var(--ink);
+  color: var(--white);
+}
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.metal {
+  background: var(--metal);
+}
+.metal-dark {
+  background: var(--metal-dark);
+}
+/* brushed-steel sheen that sweeps once on hover */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: -50% auto -50% -60%;
+  width: 40%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  transition: left 0.9s ease;
+  pointer-events: none;
+}
+.sheen:hover::after {
+  left: 130%;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
